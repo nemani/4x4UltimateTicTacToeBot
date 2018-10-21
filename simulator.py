@@ -3,6 +3,14 @@ import random
 import signal
 import time
 import copy
+import traceback
+
+from team34 import Team34
+from team241 import Team24
+from team8 import Team8
+from team6 import Team6
+from team41 import Team41 
+from team74 import Team74
 
 TIME = 16
 MAX_PTS = 68
@@ -43,6 +51,12 @@ class Board:
 
 	def print_board(self):
 		# for printing the state of the board
+		print
+		print
+		print
+		print
+		print
+		print
 		print '==============Board State=============='
 		for i in range(16):
 			if i%4 == 0:
@@ -111,13 +125,13 @@ class Board:
 
 		#checking if diamond has been won
 		if(bs[1][0] == bs[0][1] == bs[2][1] == bs[1][2]) and (bs[1][0] == 'x' or bs[1][0] == 'o'):
-			return (bs[0][0],'WON')
+			return (bs[1][0],'WON')
 		if(bs[1][1] == bs[0][2] == bs[2][2] == bs[1][3]) and (bs[1][1] == 'x' or bs[1][1] == 'o'):
-			return (bs[0][0],'WON')
+			return (bs[1][1],'WON')
 		if(bs[2][0] == bs[1][1] == bs[3][1] == bs[2][2]) and (bs[2][0] == 'x' or bs[2][0] == 'o'):
-			return (bs[0][0],'WON')
+			return (bs[2][0],'WON')
 		if(bs[2][1] == bs[1][2] == bs[3][2] == bs[2][3]) and (bs[2][1] == 'x' or bs[2][1] == 'o'):
-			return (bs[0][0],'WON')
+			return (bs[2][1],'WON')
 
 		if cntx+cnto+cntd <16:		#if all blocks have not yet been won, continue
 			return ('CONTINUE', '-')
@@ -191,6 +205,7 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 		MESSAGE = ''
 		pts = {"P1" : 0, "P2" : 0}
 		to_break = False
+		p_move = ''
 
 		try:									#try to get player 1's move			
 			p_move = obj.move(game_board, old_move, flg)
@@ -202,7 +217,8 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 		except Exception as e:
 			WINNER = opp
-			MESSAGE = 'INVALID MOVE'
+			MESSAGE = "THREW AN EXCEPTION"
+			traceback.print_exc()
 			pts[opp] = MAX_PTS			
 			return p_move, WINNER, MESSAGE, pts["P1"], pts["P2"], True, False
 		signal.alarm(0)
@@ -223,6 +239,8 @@ def player_turn(game_board, old_move, obj, ply, opp, flg):
 
 		status = game_board.find_terminal_state()		#find if the game has ended and if yes, find the winner
 		print status
+		print(p_move)
+
 		if status[1] == 'WON':							#if the game has ended after a player1 move, player 1 would win
 			pts[ply] = MAX_PTS
 			WINNER = ply
@@ -249,6 +267,7 @@ def gameplay(obj1, obj2):				#game simulator
 	game_board.print_board()
 	signal.signal(signal.SIGALRM, handler)
 	while(1):
+		# time.sleep(2)
 		#player 1 turn
 		p1_move, WINNER, MESSAGE, pts1, pts2, to_break, block_won = player_turn(game_board, old_move, obj1, "P1", "P2", fl1)
 
@@ -268,6 +287,8 @@ def gameplay(obj1, obj2):				#game simulator
 			game_board.print_board()			
 
 		#do the same thing for player 2
+		
+		# time.sleep(2)
 		p2_move, WINNER, MESSAGE, pts1, pts2, to_break, block_won = player_turn(game_board, old_move, obj2, "P2", "P1", fl2)
 
 		if to_break:
@@ -352,15 +373,16 @@ if __name__ == '__main__':
 	obj2 = ''
 	option = sys.argv[1]	
 	if option == '1':
-		obj1 = Random_Player()
+		obj1 = Team34()
 		obj2 = Random_Player()
 
 	elif option == '2':
 		obj1 = Random_Player()
-		obj2 = Manual_Player()
+		obj2 = Team24()
+		
 	elif option == '3':
-		obj1 = Manual_Player()
-		obj2 = Manual_Player()
+		obj1 = Team8()
+		obj2 = Team74()
 	else:
 		print 'Invalid option'
 		sys.exit(1)
